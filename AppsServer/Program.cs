@@ -20,7 +20,7 @@ builder.Services.AddDbContext<DataDbContext>(options => {
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 //Config Grpc
-builder.Services.AddGrpc();
+builder.Services.AddGrpc().AddJsonTranscoding();
 
 var app = builder.Build();
 

@@ -2,14 +2,43 @@ syntax = "proto3";
 
 option csharp_namespace = "AppsServer.Protos";
 
+import "google/api/annotations.proto";
+
 package product;
 
 service Product {
-  rpc GetProductById(ProductRequest) returns (ProductResponse);
-  rpc GetAllProduct(ProductAllRequest) returns (ProductAllResponse);
-  rpc CreateProduct(ProductAddRequest) returns (ProductResponse);
-  rpc UpdateProduct(ProductEditRequest) returns (ProductResponse);
-  rpc DeleteProduct(ProductRequest) returns (ProducMessageResponse);
+	rpc GetProductById(ProductRequest) returns (ProductResponse){
+		option (google.api.http) = {
+			get: "/v1/get_product_by_id/{id}"
+		};
+	};
+
+	rpc GetAllProduct(ProductAllRequest) returns (ProductAllResponse){
+		option (google.api.http) = {
+			get: "/v1/get_all_product",
+			body: "*"
+		};
+	};
+
+	rpc CreateProduct(ProductAddRequest) returns (ProductResponse){
+		option (google.api.http) = {
+			post: "/v1/create_product",
+			body: "*"
+		};
+	};
+
+	rpc UpdateProduct(ProductEditRequest) returns (ProductResponse){
+		option (google.api.http) = { 
+			put: "/v1/update_product",
+			body: "*"
+		};
+	};
+
+	rpc DeleteProduct(ProductRequest) returns (ProducMessageResponse){
+		option (google.api.http) = { 
+			delete: "/v1/delete_product/{id}"
+		}; 
+	};
 }
 
 message ProductRequest {
