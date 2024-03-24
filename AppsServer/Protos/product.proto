@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+option csharp_namespace = "AppsServer.Protos";
+
+package product;
+
+service Product {
+  rpc GetProductById(ProductRequest) returns (ProductResponse);
+  rpc GetAllProduct(ProductAllRequest) returns (ProductAllResponse);
+  rpc CreateProduct(ProductAddRequest) returns (ProductResponse);
+  rpc UpdateProduct(ProductEditRequest) returns (ProductResponse);
+  rpc DeleteProduct(ProductRequest) returns (ProducMessageResponse);
+}
+
+message ProductRequest {
+	string id = 1;
+}
+
+message ProductAllRequest {
+	int32 page = 1;
+	int32 page_limit = 2;
+}
+
+message ProductAddRequest {
+	string code = 1;
+	string name = 2;
+}
+
+message ProductEditRequest {
+	string id = 1;
+	string code = 2;
+	string name = 3;
+}
+
+message ProductResponse {
+	string id = 1;
+	string code = 2;
+	string name = 3;
+}
+
+message ProductAllResponse {
+	repeated ProductResponse products = 1;
+	int32 page = 2;
+	int32 page_limit = 3;
+	int32 page_total = 4;
+}
+
+message ProducMessageResponse {
+	string message = 1;
+}
+
+
