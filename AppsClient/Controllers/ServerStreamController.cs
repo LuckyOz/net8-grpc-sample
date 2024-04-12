@@ -28,9 +28,10 @@ namespace AppsClient.Controllers
         [HttpGet("get_all_product_server_stream_timeout")]
         public async Task<IActionResult> GetAllProductServerStreamTimeOut()
         {
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
             try
             {
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
                 var grpcChannel = GrpcChannel.ForAddress("http://localhost:5292");
                 var client = new Product.ProductClient(grpcChannel);
                 using var streamingCall = client.GetServerStreamAllProduct(new Empty(), cancellationToken: cts.Token);
@@ -48,6 +49,7 @@ namespace AppsClient.Controllers
                 Console.WriteLine($"Error: {ex.Message}");
             }
             
+            cts.Dispose();
 
             return Ok("Success");
         }
