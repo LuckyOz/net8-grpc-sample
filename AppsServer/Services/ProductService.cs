@@ -129,7 +129,7 @@ namespace AppsServer.Services
 
         public override async Task GetServerStreamAllProduct(Empty request, IServerStreamWriter<ProductResponse> responseStream, ServerCallContext context)
         {
-            var data= mapper.Map<List<ProductResponse>>(await dataDbContext.MasterProducts.ToListAsync());
+            var data = mapper.Map<List<ProductResponse>>(await dataDbContext.MasterProducts.ToListAsync());
 
             foreach (var product in data)
             {
@@ -137,6 +137,29 @@ namespace AppsServer.Services
 
                 await Task.Delay(1000);
             }
+        }
+
+        #endregion
+
+        #region "Client Streaming"
+
+        public override async Task<ProductAllResponse> CreateClientStreamProduct(IAsyncStreamReader<ProductAddRequest> requestStream, ServerCallContext context)
+        {
+            await foreach (var request in requestStream.ReadAllAsync())
+            {
+                if (string.IsNullOrEmpty(request.Code) || string.IsNullOrEmpty(request.Name))
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Code and Name cannot be null"));
+
+                var dataCheck =
+                    await dataDbContext.MasterProducts.FirstOrDefaultAsync(q => q.Code == request.Code);
+
+                if (dataCheck != null)
+                    continue;
+
+                await CreateProduct(request);
+            }
+
+            return await GetAllProduct(1, 100);
         }
 
         #endregion
@@ -191,7 +214,7 @@ namespace AppsServer.Services
 
         private async Task<ProductResponse> UpdateProduct(ProductEditRequest request)
         {
-            var data = 
+            var data =
                 await dataDbContext.MasterProducts.FirstOrDefaultAsync(q => q.Id.ToString() == request.Id);
 
             data!.Code = request.Code;
@@ -199,14 +222,14 @@ namespace AppsServer.Services
 
             await dataDbContext.SaveChangesAsync();
 
-            var dataNew = await GetProductById(request.Id); 
+            var dataNew = await GetProductById(request.Id);
 
             return dataNew;
         }
 
         private async Task<ProducMessageResponse> DeleteProduct(ProductRequest request)
         {
-            var data = 
+            var data =
                 await dataDbContext.MasterProducts.FirstOrDefaultAsync(q => q.Id.ToString() == request.Id);
 
             data!.ActiveFlag = false;
