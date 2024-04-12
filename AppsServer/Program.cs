@@ -32,7 +32,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 //Run Grpc Services
-app.MapGrpcService<GreeterService>();
 app.MapGrpcService<ProductService>();
 
 //Run Rest Services
