@@ -1,15 +1,17 @@
 ﻿
 using Grpc.Core;
 using AutoMapper;
+using Newtonsoft.Json;
 using AppsServer.Protos;
 using AppsServer.Models.Context;
 using AppsServer.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Google.Protobuf.WellKnownTypes;
+using System.Threading.Channels;
 
 namespace AppsServer.Services
 {
-    public class ProductService(DataDbContext dataDbContext, IMapper mapper) : Product.ProductBase
+    public class ProductService(DataDbContext dataDbContext, IMapper mapper, ILogger<ProductService> logger) : Product.ProductBase
     {
         #region "Unary"
 
@@ -164,6 +166,19 @@ namespace AppsServer.Services
 
         #endregion
 
+        #region "Bi-Directional Streaming"
+
+        public override async Task CreateGetStreamProduct(IAsyncStreamReader<ProductAddRequest> requestStream, IServerStreamWriter<ProductResponse> responseStream, 
+            ServerCallContext context)
+        {
+            await foreach (var request in requestStream.ReadAllAsync())
+            {
+                logger.LogInformation($"Received from client: {JsonConvert.SerializeObject(request)}");
+                await responseStream.WriteAsync(await CreateProduct(request));
+            }
+        }
+
+        #endregion
 
         private async Task<ProductResponse> GetProductById(string id)
         {

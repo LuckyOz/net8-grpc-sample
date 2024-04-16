@@ -13,6 +13,7 @@ service Product {
   rpc DeleteProduct(ProductRequest) returns (ProducMessageResponse);
   rpc GetServerStreamAllProduct(google.protobuf.Empty) returns (stream ProductResponse);
   rpc CreateClientStreamProduct(stream ProductAddRequest) returns (ProductAllResponse);
+  rpc CreateGetStreamProduct(stream ProductAddRequest) returns (stream ProductResponse);
 }
 
 message ProductRequest {
